@@ -1,0 +1,17 @@
+docker run -p 3306:3306 --name mysql_boot -e MYSQL_PASSWORD=1 -e MYSQL_DATABASE=springboot -e MYSQL_USER=inyong -e MYSQL_PASSWORD=pass -d mysql
+
+
+docker run -p 3306:3306 --name mysql_node -e MYSQL_ROOT_PASSWORD=1 -e MYSQL_DATABASE=node -e MYSQL_USER=inyong -e MYSQL_PASSWORD=pass -d mysql:5
+
+create table user(
+uid char(50),
+upw char(50),
+name char(50),
+upoint int,
+PRIMARY KEY(uid)
+);
+
+
+
+insert into user
+values ('u001','abc','name01',50)
