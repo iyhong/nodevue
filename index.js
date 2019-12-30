@@ -1,38 +1,41 @@
 const express= require('express');
 const app = express(),
-      testJson = require('./test/test.json');
+      testJson = require('./test/test.json'),
+      cors = require('cors'),
+      bodyParser = require('body-parser');
 
-const Pool = require('./pool');
-const Mydb = require('./mydb');
+const Pool = require('./pool'),
+      Mydb = require('./mydb'),
+      rest = require('./rest');
 
 app.use(express.static('public'));
 app.set('views', __dirname+'/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 
+
+app.use(cors());
+// Access-Control-Allow-Origin 해결
+// app.use( (req, res, next)=>{
+//     res.header("Access-Control-Allow-Origin", req.header.origin);
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     res.header("Access-Control-Allow-Headers", "X-Requested-With");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//     res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+//     if(req.method==='OPTIONS'){
+//         res.status(200).end();
+//     }else {
+//         next();
+//     }
+// });
+
+app.use(bodyParser.json({limit : '10mb'}));
+app.use(bodyParser.urlencoded({limit : '10mb', extended:true}));
+
+
 const pool = new Pool();
 
-app.get('/', (req, res) =>{
-    // res.send("Hello Node js!!");
-    // res.json(testJson);
-    res.render('index', {name:'hong inyong'});
-});
-
-app.get('/test/:email', (req, res)=>{
-    testJson.email = req.param.email;
-    testJson.aa = req.query.aa; 
-    res.json(testJson);
-});
-
-app.get('/dbtest/:user', (req, res) =>{
-    let user = req.params.user;
-    let mydb = new Mydb(pool);
-    mydb.execute(conn => {
-        conn.query("select * from user where uid=?", [user], (err,ret)=>{
-            res.json(ret);
-        });
-    })
-});
+rest(app, pool);
 
 const server = app.listen(7000, ()=>{
     console.log("Express's started on port 7000");
